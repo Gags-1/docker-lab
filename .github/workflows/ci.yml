@@ -32,7 +32,10 @@ jobs:
         run: docker push gagan681/docker-lab-backend:latest
 
       - name: Build frontend image
-        run: docker build -t docker-lab-frontend ./frontend
+        run: docker build -t gagan681/docker-lab-frontend:latest ./frontend
+
+      - name: Push frontend image
+        run: docker push gagan681/docker-lab-frontend:latest
 
       - name: Start application
         run: docker compose up -d
