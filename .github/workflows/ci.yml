@@ -39,26 +39,25 @@ jobs:
 
       - name: Start application
         run: docker compose up -d
-        continue-on-error: true
 
       - name: Test backend health
         run: curl --fail http://localhost:8000/health
 
       - name: Check frontend
         run: |
-         sleep 5
-         curl --fail http://localhost:3000
+          sleep 5
+          curl --fail http://localhost:3000
 
       - name: Check application status
         run: docker compose ps
 
       - name: Show database logs
+        if: always()
         run: docker compose logs db
 
       - name: Stop application
         if: always()
         run: docker compose down
-
 
   deploy:
     needs: test
@@ -70,21 +69,65 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+
         run: |
+          set -e
+
+          echo "Starting SSH agent..."
           eval "$(ssh-agent -s)"
+
+          echo "Loading EC2 private key..."
           printf '%s\n' "$EC2_SSH_KEY" | ssh-add -
 
           mkdir -p ~/.ssh
-          echo "Testing SSH port on EC2..."
-          timeout 10 bash -c "</dev/tcp/$EC2_HOST/22"
-          echo "SSH port is reachable"
+          chmod 700 ~/.ssh
 
-          ssh "$EC2_USER@$EC2_HOST" << 'EOF'
+          echo "Getting EC2 host key..."
+          ssh-keyscan -T 10 -H "$EC2_HOST" > ~/.ssh/known_hosts
+
+          if [ ! -s ~/.ssh/known_hosts ]; then
+            echo "ERROR: Could not retrieve EC2 host key"
+            exit 1
+          fi
+
+          chmod 600 ~/.ssh/known_hosts
+
+          echo "EC2 host key added successfully"
+
+          echo "Testing SSH connection..."
+          ssh \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
+            "$EC2_USER@$EC2_HOST" \
+            "echo 'SSH connection successful'"
+
+          echo "Deploying application..."
+
+          ssh \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
+            "$EC2_USER@$EC2_HOST" << 'EOF'
+
+            set -e
+
             cd ~/docker-lab
+
+            echo "Pulling latest Git changes..."
             git pull origin master
+
+            echo "Pulling latest Docker images..."
             docker compose pull
+
+            echo "Starting application..."
             docker compose up -d --remove-orphans
+
+            echo "Application status:"
             docker compose ps
+
           EOF
+
+          echo "Deployment completed successfully"
 
           ssh-agent -k
