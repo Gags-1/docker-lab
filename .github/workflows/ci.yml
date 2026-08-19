@@ -16,8 +16,8 @@ jobs:
       - name: Show project files
         run: ls -la
 
-      - name: Show Docker version
-        run: docker --version
+      - name: Build backend image
+        run: docker build -t docker-lab-backend ./backend
 
-      - name: CI is working
-        run: echo "CI pipeline is working!"
+      - name: Build frontend image
+        run: docker build -t docker-lab-frontend ./frontend
