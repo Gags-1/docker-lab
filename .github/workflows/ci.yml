@@ -29,6 +29,9 @@ jobs:
         run: docker compose up -d
         continue-on-error: true
 
+      - name: Test backend health
+        run: curl --fail http://localhost:8000/health
+
       - name: Check application status
         run: docker compose ps
 
