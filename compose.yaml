@@ -1,17 +1,15 @@
 name: docker-lab
 services:
   frontend:
-    build:
-      context: ./frontend
+    image: gagan681/docker-lab-frontend:latest
     ports:
       - "3000:80"
     depends_on:
       backend:
-          condition: service_healthy
+        condition: service_healthy
     restart: unless-stopped
   backend:
-    build:
-      context: ./backend
+    image: gagan681/docker-lab-backend:latest
     ports:
       - "8000:8000"
     environment:
