@@ -33,7 +33,9 @@ jobs:
         run: curl --fail http://localhost:8000/health
 
       - name: Check frontend
-        run: curl --fail http://localhost:3000
+        run: |
+         sleep 5
+         curl --fail http://localhost:3000
 
       - name: Check application status
         run: docker compose ps
