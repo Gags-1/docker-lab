@@ -21,3 +21,9 @@ jobs:
 
       - name: Build frontend image
         run: docker build -t docker-lab-frontend ./frontend
+
+      - name: Start application
+        run: docker compose up -d
+
+      - name: Check application status
+        run: docker compose ps
