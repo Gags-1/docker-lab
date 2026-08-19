@@ -114,9 +114,6 @@ jobs:
 
             cd ~/docker-lab
 
-            echo "Pulling latest Git changes..."
-            git pull origin master
-
             echo "Pulling latest Docker images..."
             docker compose pull
 
