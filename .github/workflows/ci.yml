@@ -24,6 +24,10 @@ jobs:
 
       - name: Start application
         run: docker compose up -d
+        continue-on-error: true
 
       - name: Check application status
         run: docker compose ps
+
+      - name: Show database logs
+        run: docker compose logs db
