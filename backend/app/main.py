@@ -24,6 +24,28 @@ def get_db_connection():
     )
 
 
+def init_db():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS tasks (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            completed BOOLEAN NOT NULL DEFAULT FALSE
+        )
+        """
+    )
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+
+init_db()
+
 @app.get("/")
 def root():
     return {"message": "FastAPI backend is running"}
