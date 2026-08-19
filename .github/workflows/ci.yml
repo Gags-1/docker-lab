@@ -71,10 +71,17 @@ jobs:
           EC2_USER: ${{ secrets.EC2_USER }}
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
         run: |
+          if [ -z "${EC2_SSH_KEY:-}" ]; then
+            echo "ERROR: EC2_SSH_KEY secret is empty or unavailable"
+            exit 1
+          else
+            echo "EC2_SSH_KEY secret is present"
+          fi
+
           printf '%s\n' "$EC2_SSH_KEY" > deploy_key.pem
           chmod 600 deploy_key.pem
           test -s deploy_key.pem
-          
+
           mkdir -p ~/.ssh
           ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
 
