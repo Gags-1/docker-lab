@@ -26,7 +26,10 @@ jobs:
         run: ls -la
 
       - name: Build backend image
-        run: docker build -t docker-lab-backend ./backend
+        run: docker build -t gagan681/docker-lab-backend:latest ./backend
+
+      - name: Push backend image
+        run: docker push gagan681/docker-lab-backend:latest
 
       - name: Build frontend image
         run: docker build -t docker-lab-frontend ./frontend
