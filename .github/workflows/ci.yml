@@ -42,3 +42,7 @@ jobs:
 
       - name: Show database logs
         run: docker compose logs db
+
+      - name: Stop application
+        if: always()
+        run: docker compose down
