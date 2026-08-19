@@ -75,7 +75,9 @@ jobs:
           printf '%s\n' "$EC2_SSH_KEY" | ssh-add -
 
           mkdir -p ~/.ssh
-          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+          echo "Testing SSH port on EC2..."
+          timeout 10 bash -c "</dev/tcp/$EC2_HOST/22"
+          echo "SSH port is reachable"
 
           ssh "$EC2_USER@$EC2_HOST" << 'EOF'
             cd ~/docker-lab
